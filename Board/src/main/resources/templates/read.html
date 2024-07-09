@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 제목</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: white;
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, .post-info {
+            text-align: center;
+        }
+
+        .post-info {
+            font-size: 0.85em;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .post-content {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .comment-section {
+            margin-top: 20px;
+        }
+
+        hr {
+            border: 0;
+            height: 2px;
+            background: #ddd;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        input[type="submit"], .edit-btn {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        input[type="submit"]:hover, .edit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .comment {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .author {
+            font-weight: bold;
+        }
+
+        .edit-btn {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1 th:text="${board.title}">게시글 제목</h1>
+    <div class="post-info">
+        <span th:text="${board.nickName} + ' - ' + ${#temporals.format(board.time, 'yyyy-MM-dd HH:mm:ss')}"></span>
+    </div>
+    <div class="post-content" th:text="${board.content}">
+    </div>
+    <hr>
+    <div class="comment-section">
+        <h2>댓글</h2>
+        <div class="comments">
+            <!-- 서버에서 로드된 댓글 목록 -->
+            <div th:each="comment : ${comment}" class="comment">
+                <p th:text="${comment.commentContent}"></p>
+                <span class="author" th:text="${comment.nickName}"></span>
+                <span th:text="${#temporals.format(comment.time, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                <button class="edit-btn">수정</button>
+            </div>
+        </div>
+        <form id="commentForm">
+            <label for="comment-author">사용자명:</label>
+            <input type="text" id="comment-author" name="author" required>
+
+            <label for="comment-password">비밀번호:</label>
+            <input type="password" id="comment-password" name="password" required>
+
+            <label for="comment-content">댓글:</label>
+            <textarea id="comment-content" name="content" required rows="4"></textarea>
+
+            <input type="submit" value="댓글 작성">
+        </form>
+    </div>
+</div>
+<script th:inline="javascript">
+    document.getElementById("commentForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+        // 값 가져오기
+        var nickname = document.getElementById("comment-author").value;
+        var password = document.getElementById("comment-password").value;
+        var content = document.getElementById("comment-content").value;
+        var boardid = /*[(${id})]*/ null;
+
+
+        // 데이터를 객체로 정리
+        var postData = {
+            nickname: nickname,
+            password: password,
+            content: content,
+            boardid : boardid
+        };
+
+        // fetch를 이용한 POST 요청
+        fetch("/Board/comment", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(postData)
+        })
+        alert("댓글이 작성되었습니다");
+        window.location.href = "/Board/" + /*[(${id})]*/ null; // 홈 화면으로 이동
+    });
+</script>
+</body>
+</html>

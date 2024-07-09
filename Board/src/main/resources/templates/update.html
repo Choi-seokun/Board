@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 수정</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: white;
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>게시글 수정</h1>
+    <form id="putForm">
+        <label for="title">제목:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="password">비밀번호:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="content">내용:</label>
+        <textarea id="content" name="content" required rows="10"></textarea>
+
+        <input type="submit" value="게시글 수정">
+    </form>
+</div>
+<script th:inline="javascript">
+    document.getElementById("putForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+        // 값 가져오기
+        var title = document.getElementById("title").value;
+        var password = document.getElementById("password").value;
+        var content = document.getElementById("content").value;
+        var id = /*[(${boardid})]*/ null;
+
+        // 데이터를 객체로 정리
+        var putData = {
+            id: id,
+            title: title,
+            password: password,
+            content: content
+        };
+
+        // fetch를 이용한 PUT 요청
+        fetch("/Board/updateinfo", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(putData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // 성공적으로 응답을 받았을 때 결과를 JSON으로 파싱
+                } else {
+                    throw new Error("서버 오류 발생");
+                }
+            })
+            .then(isSuccess => {
+                if (isSuccess) {
+                    alert("게시글이 수정되었습니다.");
+                    window.location.href = "/Board/paging";
+                } else {
+                    alert("비밀번호가 일치하지 않습니다.");
+                }
+            })
+    });
+</script>
+</body>
+</html>
